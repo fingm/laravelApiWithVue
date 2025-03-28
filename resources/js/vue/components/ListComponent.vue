@@ -2,7 +2,7 @@
     <div>
         <h1>Post List</h1>
     </div>
-    <o-table :data="posts">
+    <o-table :data="posts.data" :loading="isLoading">
         <o-table-column field="id" label="ID" v-slot="p">
             {{ p.row.id }}
         </o-table-column>
@@ -16,6 +16,20 @@
             {{ p.row.category.title }}
         </o-table-column>
     </o-table>
+    <!---Consulta primero si existe data-->
+    <o-pagination 
+                  v-if="posts.data && posts.data.length > 0"
+                  @change="updatePage"
+                   :total="posts.total"
+                   v-model:current="currentPage" 
+                   :range-before="2"
+                   :range-after="2"
+                   size="small"
+                   :simple="false"
+                   :rounded="true"
+                   :per-page="posts.per_page"
+    />
+
 </template>
 
 <script>
@@ -23,20 +37,28 @@ export default{
     data(){
         return{
             posts:[],
-            isLoading: true
+            isLoading: true,
+            currentPage:1
         }
     },
 
     mounted(){
-        this.$axios.get('/api/post').then((res)=>{
-           this.posts =  res.data.data,
-           this.isLoading = false
-        })
+        this.listPage()
     },
 
     methods:{
-        clickMe(){
-            alert('Oruga');
+        updatePage(){
+            console.log(this.currentPage);
+            setTimeout(() => {
+                this.listPage()
+            },100);
+        },
+        listPage(){
+            this.isLoading = true
+            this.$axios.get('/api/post?page='+this.currentPage).then((res)=>{
+                this.posts =  res.data,
+                this.isLoading = false
+            })
         }
     }
 }

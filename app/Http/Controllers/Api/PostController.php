@@ -21,7 +21,7 @@ class PostController extends Controller
 
     public function index()
     {
-        return response()->json(Post::with('category')->paginate(5));
+        return response()->json(Post::with('category')->paginate(2));
     }
 
     public function store(StoreRequest $request)
