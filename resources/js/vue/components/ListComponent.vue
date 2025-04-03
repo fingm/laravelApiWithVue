@@ -1,4 +1,5 @@
 <template>
+    <router-link :to="{ name:'save' }">Create</router-link>
     <div>
         <h1>Post List</h1>
     </div>
@@ -14,6 +15,9 @@
         </o-table-column>
         <o-table-column field="category_id" label="category" v-slot="p">
             {{ p.row.category.title }}
+        </o-table-column>
+        <o-table-column field="category_id" label="Actions" v-slot="p">
+            <router-link :to="{ name:'save',params:{ 'slug': p.row.slug }}">edit </router-link>
         </o-table-column>
     </o-table>
     <!---Consulta primero si existe data-->

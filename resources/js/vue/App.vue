@@ -1,11 +1,11 @@
 <template>
     <div>
         <h1>Principal</h1>
-        <list/>
+        <router-view></router-view>
     </div>
 </template>
 <script>
-    import List from "/resources/js/vue/components/ListComponent.vue";
+    import List from './components/ListComponent.vue';
 
     export default{
         components: {
