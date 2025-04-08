@@ -11,7 +11,7 @@ const routes = [
     },
     {
         name: 'save',
-        path: '/save',
+        path: '/save/:slug?',//Opcionalmente recibe el slug, asi el componente sabe si es creacion o edicion
         component: Save
     }
 ]
