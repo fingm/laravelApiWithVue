@@ -32,16 +32,41 @@
             </o-select>
         </o-field>
     </div>
-    <div class="mt-3">
-        <o-button variant="primary" @click="send">Send</o-button>
+    <o-button variant="primary" @click="send">Send</o-button>
+    <div class="mt-3" v-if="post">
+        <o-field :message="fileError" :variant="fileError ? 'danger' : 'primary'">
+            <o-upload v-model="file">
+                <o-button tag="a" variant="primary">
+                    <o-icon icon="upload"></o-icon>
+                    <span>Click to upload</span>
+                </o-button>
+            </o-upload>
+        </o-field>
+        <o-button icon-left="upload" @click="upload">
+            Upload
+        </o-button>
+        <!--Seccion para drag and drop-->
+        <h3>Drag and drop</h3>
+        <o-field :message="fileError" :variant="fileError ? 'danger' : 'primary'">
+            <o-upload v-model="filesDad" multiple drag-drop>
+                <section>
+                    <o-icon icon="upload"></o-icon>
+                    <span>Drag and Drop Area</span>
+                </section>
+            </o-upload>
+        </o-field>
     </div>
+    <!-- Mostrar los nombres de los archivos arrastrados-->
+    <span v-for="(file,index) in filesDad" :key="index">
+        {{ file.name }}
+    </span>
 </template>
 
 <script>
 export default  {
     async mounted(){
         if(this.$route.params.slug){//caso que sea edicion
-            this.post = await this.$axios.get("/api/post/slug/"+this.$route.params.slug) //De esta manera, la operacion sigue
+            this.post = await this.$axios.get(this.$root.urls.getPostBySlug+this.$route.params.slug) //De esta manera, la operacion sigue
             this.post  = this.post.data;
             this.initPost();
         }
@@ -59,13 +84,16 @@ export default  {
                 posted:'',
             },
             errors:{//Manejo de errores
-                    title:'',
-                    slug:'',
-                    description:'',
-                    content:'',
-                    category_id:'',
-                    posted:''
-                },
+                title:'',
+                slug:'',
+                description:'',
+                content:'',
+                category_id:'',
+                posted:''
+            },
+            fileError: '',
+            file: null,
+            filesDad:[],
             categories:[]
         }
     },
@@ -78,6 +106,20 @@ export default  {
             this.form.slug = this.post.slug;
             this.form.category_id = this.form.category_id;
         },
+        upload(){//Subir imagenes
+            this.fileError=''
+            const formData = new FormData()
+            formData.append('image',this.file)
+            this.$axios.post(this.$root.urls.upload+this.post.id, formData,{
+                headers: {
+                    'Content-Type' : 'multipart/form-data'
+                }
+            }).then((res)=> {
+                console.log(res);
+            }).catch((error)=> {
+                this.fileError = error.response.data.message
+            })
+        },
         cleanErrorsForm(){
             this.errors.title = '';
             this.errors.content = '';
@@ -87,7 +129,7 @@ export default  {
             this.errors.category_id = '';
         },
         getCategory(){
-            this.$axios.get('/api/category/all').then((res)=>{
+            this.$axios.get(this.$root.urls.getCategoriesAll).then((res)=>{
                 this.categories = res.data;
             })
         },
@@ -96,7 +138,7 @@ export default  {
 
             if(this.post == ''){
                 //create
-                this.$axios.post('/api/post',this.form).then(res => {
+                this.$axios.post(this.$root.urls.postPost,this.form).then(res => {
                 console.log(res)
 
 
@@ -130,7 +172,7 @@ export default  {
                 })
             }else{
                 //update
-                this.$axios.patch('/api/post/'+this.post.id,this.form).then(res => {
+                this.$axios.patch(this.$root.urls.postPatch+this.post.id,this.form).then(res => {
                 console.log(res)
 
                 //Pops ups cuando creams un elemento
@@ -162,6 +204,28 @@ export default  {
                     }
                 })
             }
+        }
+    },// Funcion para Drag and drop
+    watch:{
+        filesDad:{
+            handler(val){
+                //return console.log(val[val.length-1])
+
+            this.fileError=''
+            const formData = new FormData()
+            formData.append('image',val[val.length-1])
+            this.$axios.post(this.$root.urls.upload+this.post.id, formData,{
+                headers: {
+                    'Content-Type' : 'multipart/form-data'
+                }
+            }).then((res)=> {
+                console.log(res);
+            }).catch((error)=> {
+                this.fileError = error.response.data.message
+            })
+
+            },
+            deep: true
         }
     }
 }

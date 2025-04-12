@@ -82,7 +82,7 @@ export default{
         listPage(){
             this.confirmDeleteAction = false;
             this.isLoading = true
-            this.$axios.get('/api/post?page='+this.currentPage).then((res)=>{
+            this.$axios.get(this.$root.urls.postPaginate+'?page='+this.currentPage).then((res)=>{
                 this.posts =  res.data,
                 this.isLoading = false
             })
@@ -97,7 +97,7 @@ export default{
                 closable:true,
             })
 
-            this.$axios.delete('/api/post/'+this.deletePostRow.row.id)
+            this.$axios.delete(this.$root.urls.postDelete+this.deletePostRow.row.id)
             this.posts.data.splice(this.deletePostRow.indexOf,1)
         }
     }

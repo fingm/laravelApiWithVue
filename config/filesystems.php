@@ -46,6 +46,11 @@ return [
             'throw' => false,
             'report' => false,
         ],
+        //Borrar imagen cuando subimos una nueva
+        'public_upload' =>[
+            'driver' =>'local',
+            'root' => public_path(),
+        ],
 
         's3' => [
             'driver' => 's3',
